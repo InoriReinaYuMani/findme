@@ -1,0 +1,54 @@
+def ci_setup
+  sh("xcodegen generate") unless File.exist?("FindMe.xcodeproj")
+end
+
+def app_store_connect_api_key_from_env
+  app_store_connect_api_key(
+    key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
+    issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+    key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_P8"),
+    is_key_content_base64: true
+  )
+end
+
+def ci_scheme
+  ENV.fetch("SCHEME", "FindMe")
+end
+
+def ci_destination
+  ENV.fetch("DESTINATION", "platform=iOS Simulator,name=iPhone 16")
+end
+
+platform :ios do
+  desc "Generate the Xcode project and run lint/build/tests for pull requests."
+  lane :ci do
+    ci_setup
+    sh("swiftlint lint --strict")
+    sh("swift test")
+    scan(
+      scheme: ci_scheme,
+      destination: ci_destination,
+      clean: true,
+      code_coverage: true,
+      skip_detect_devices: true
+    )
+  end
+
+  desc "Archive and upload a TestFlight build. Requires App Store Connect API key secrets."
+  lane :beta do
+    ci_setup
+    api_key = app_store_connect_api_key_from_env
+    increment_build_number(build_number: ENV.fetch("BUILD_NUMBER", Time.now.utc.strftime("%Y%m%d%H%M")))
+    build_app(
+      scheme: ci_scheme,
+      export_method: "app-store",
+      clean: true,
+      output_directory: "build"
+    )
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+      changelog: ENV.fetch("TESTFLIGHT_CHANGELOG", "Automated TestFlight build from CI.")
+    )
+  end
+end
