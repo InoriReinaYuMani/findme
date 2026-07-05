@@ -1,0 +1,36 @@
+name: Feature request
+description: Create an implementation-ready task for Codex.
+title: "[Feature]: "
+labels: [feature]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should the user be able to do?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Files/modules likely involved and constraints.
+      placeholder: "Sources/..., Tests/..."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checklist Codex and reviewers can verify.
+      value: |
+        - [ ] 
+        - [ ] Tests added or updated
+        - [ ] CI passes
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Implementation notes
+      description: Edge cases, screenshots, references, or desired API shape.
