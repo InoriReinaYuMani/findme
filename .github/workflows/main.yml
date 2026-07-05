@@ -1,0 +1,43 @@
+name: iOS CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select default Xcode
+        run: xcodebuild -version
+
+      - name: Install tooling
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then brew install xcodegen; fi
+          if ! command -v swiftlint >/dev/null 2>&1; then brew install swiftlint; fi
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Lint
+        run: swiftlint lint --strict
+
+      - name: Swift package tests
+        run: swift test
+
+      - name: Xcode app build
+        run: |
+          xcodebuild build \
+            -scheme FindMe \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
