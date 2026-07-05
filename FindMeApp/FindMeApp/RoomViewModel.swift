@@ -1,7 +1,7 @@
 import CoreLocation
+import FindMeCore
 import Foundation
 import MapKit
-import FindMeCore
 
 @MainActor
 final class RoomViewModel: NSObject, ObservableObject {

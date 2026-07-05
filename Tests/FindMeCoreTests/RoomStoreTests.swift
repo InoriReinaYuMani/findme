@@ -1,5 +1,5 @@
-import XCTest
 @testable import FindMeCore
+import XCTest
 
 final class RoomStoreTests: XCTestCase {
     func testSamePassphraseJoinsSameRoomIgnoringCase() async throws {

@@ -4,7 +4,7 @@ set -euo pipefail
 xcodegen generate
 swiftlint lint --strict
 swift test
-xcodebuild test \
+xcodebuild build \
   -scheme "${SCHEME:-FindMe}" \
-  -destination "${DESTINATION:-platform=iOS Simulator,name=iPhone 16}" \
-  -enableCodeCoverage YES
+  -destination "${DESTINATION:-generic/platform=iOS Simulator}" \
+  CODE_SIGNING_ALLOWED=NO

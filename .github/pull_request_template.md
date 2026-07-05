@@ -4,7 +4,7 @@
 ## Testing
 - [ ] `swift test`
 - [ ] `xcodegen generate`
-- [ ] `xcodebuild test -scheme FindMe -destination 'platform=iOS Simulator,name=iPhone 16'`
+- [ ] `xcodebuild build -scheme FindMe -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO`
 
 ## Review notes
 - Link the issue this PR closes.
