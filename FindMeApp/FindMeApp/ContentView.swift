@@ -15,6 +15,14 @@ struct ContentView: View {
             }
             .navigationTitle("FindMe")
         }
+        .alert("確認してください", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
     }
 }
 
@@ -31,6 +39,7 @@ private struct JoinRoomView: View {
                     viewModel.createOrJoinRoom()
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(viewModel.isJoining)
             }
 
             Section("使い方") {
@@ -38,14 +47,6 @@ private struct JoinRoomView: View {
                 Text("このサンプルはアプリ内メモリの共有ストアを使います。本番では RoomStore をサーバー実装に差し替えてください。")
                     .foregroundStyle(.secondary)
             }
-        }
-        .alert("入力を確認してください", isPresented: Binding(
-            get: { viewModel.errorMessage != nil },
-            set: { if !$0 { viewModel.errorMessage = nil } }
-        )) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(viewModel.errorMessage ?? "")
         }
     }
 }
@@ -64,7 +65,7 @@ private struct RoomMapView: View {
                     )) {
                         Image(systemName: "person.circle.fill")
                             .font(.title)
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(location.id == viewModel.selectedTargetID ? .orange : .blue)
                     }
                 }
             }
@@ -73,10 +74,38 @@ private struct RoomMapView: View {
                 MapCompass()
             }
 
+            if let target = viewModel.selectedTarget {
+                TargetTrackingView(name: target.displayName, proximity: viewModel.proximity)
+            }
+
             List {
                 Section("ルームID") {
                     Text(roomID)
                         .font(.footnote.monospaced())
+                }
+
+                Section("接近ナビ") {
+                    if viewModel.otherParticipants.isEmpty {
+                        Text("相手の位置情報が届くと、ここで相手を選べます。")
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(viewModel.otherParticipants) { participant in
+                        Button {
+                            viewModel.selectTarget(participant)
+                        } label: {
+                            HStack {
+                                Text(participant.displayName)
+                                Spacer()
+                                if participant.id == viewModel.selectedTargetID {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .accessibilityLabel("選択中")
+                                }
+                            }
+                        }
+                    }
+                    if viewModel.selectedTargetID != nil {
+                        Button("相手の選択を解除") { viewModel.selectTarget(nil) }
+                    }
                 }
 
                 Section("参加者") {

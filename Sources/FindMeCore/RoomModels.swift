@@ -18,19 +18,22 @@ public struct SharedLocation: Equatable, Identifiable, Codable, Sendable {
     public let latitude: Double
     public let longitude: Double
     public let updatedAt: Date
+    public let horizontalAccuracy: Double?
 
     public init(
         id: UUID = UUID(),
         displayName: String,
         latitude: Double,
         longitude: Double,
-        updatedAt: Date = Date()
+        updatedAt: Date = Date(),
+        horizontalAccuracy: Double? = nil
     ) {
         self.id = id
         self.displayName = displayName
         self.latitude = latitude
         self.longitude = longitude
         self.updatedAt = updatedAt
+        self.horizontalAccuracy = horizontalAccuracy
     }
 }
 
