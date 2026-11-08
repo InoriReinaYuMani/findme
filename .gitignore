@@ -2,3 +2,6 @@
 DerivedData/
 .swiftpm/
 *.xcuserdata/
+
+# Per-app Firebase connection settings are provided locally or via CI secrets.
+GoogleService-Info.plist
